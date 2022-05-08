@@ -6,8 +6,31 @@ defmodule StreamProcessor do
     IO.inspect("The Application has started")
     url1 = "http://localhost:4000/tweets/1"
     url2 = "http://localhost:4000/tweets/2"
+    engagement = "Engagement"
+    sentiment = "Sentiment"
+    retweet = "Retweet"
 
     children = [
+      %{
+        id: EngagementLoadBalancer,
+        start: {EngagementAnalysis.LoadBalancer, :start_module, []}
+      },
+      %{
+        id: EngagementPoolSupervisor,
+        start: {EngagementAnalysis.PoolSupervisor, :start_module, []}
+      },
+      %{
+        id: EngagementAutoScaler,
+        start: {EngagementAnalysis.AutoScaler, :start_module, []}
+      },
+      #      %{
+#        id: SentimentTopSupervisor,
+#        start: {LoadBalancer, :start_module, [sentiment]}
+#      },
+#      %{
+#        id: RetweetTopSupervisor,
+#        start: {LoadBalancer, :start_module, [retweet]}
+#      },
       %{
         id: Router,
         start: {Router, :start_module, []}
