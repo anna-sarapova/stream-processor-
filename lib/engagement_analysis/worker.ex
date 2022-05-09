@@ -3,7 +3,7 @@ defmodule EngagementAnalysis.Worker do
   require Logger
 
   def start_module(index) do
-    GenServer.start_link(__MODULE__, index, name: String.to_atom("EngagementWorker#{index}"))
+    GenServer.start_link(__MODULE__, index, name: String.to_atom("EngagementPinguin#{index}"))
   end
 
   def receive_tweets(pid, id, tweet) do
@@ -37,7 +37,7 @@ defmodule EngagementAnalysis.Worker do
     retweet_count = tweet_data["message"]["tweet"]["retweet_count"]
 #    Logger.info("Worker: Pinguin #{inspect(index)} has retweet: #{inspect(retweet_count)}", ansi_color: :light_magenta)
     engagement_score = calculate_engagement_score(favourites_count, follower_count, retweet_count)
-    Logger.info("Worker: Pinguin #{inspect(index)} has engagement-score: #{inspect(engagement_score)}", ansi_color: :cyan)
+    Logger.info("Worker: Pinguin #{inspect(index)} has engagement-score: #{inspect(engagement_score)}", ansi_color: :light_cyan)
     {:noreply, index}
   end
 end

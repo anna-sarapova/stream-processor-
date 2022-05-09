@@ -29,7 +29,7 @@ defmodule RetweetExtracting.PoolSupervisor do
 
       # TODO safe termination
       auto_scaler_nr when (auto_scaler_nr < 0) ->
-        IO.inspect("Pool Supervisor: Child to kill #{inspect(auto_scaler_nr * (-1))}")
+        IO.inspect("Retweet Pool Supervisor: Child to kill #{inspect(auto_scaler_nr * (-1))}")
         RetweetExtracting.LoadBalancer.terminate_workers(auto_scaler_nr)
       _ ->
         :do_nothing

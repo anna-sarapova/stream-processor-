@@ -2,7 +2,7 @@ defmodule EngagementAnalysis.PoolSupervisor do
   use DynamicSupervisor
 
   def start_module() do
-    IO.inspect("Hi, I'm engagement pool supervisor")
+    IO.inspect("Hi, I'm Engagement Pool Supervisor")
     supervisor = DynamicSupervisor.start_link(__MODULE__, %{}, name: __MODULE__)
     start_worker(10)
     supervisor
@@ -29,7 +29,7 @@ defmodule EngagementAnalysis.PoolSupervisor do
 
       # TODO safe termination
       auto_scaler_nr when (auto_scaler_nr < 0) ->
-        IO.inspect("Pool Supervisor: Child to kill #{inspect(auto_scaler_nr * (-1))}")
+        IO.inspect("Engagement Pool Supervisor: Child to kill #{inspect(auto_scaler_nr * (-1))}")
         EngagementAnalysis.LoadBalancer.terminate_workers(auto_scaler_nr)
       _ ->
         :do_nothing

@@ -3,7 +3,7 @@ defmodule RetweetExtracting.Worker do
   require Logger
 
   def start_module(index) do
-    GenServer.start_link(__MODULE__, %{}, name: String.to_atom("RetweetWorker#{index}"))
+    GenServer.start_link(__MODULE__, %{}, name: String.to_atom("RetweetPinguin#{index}"))
   end
 
   def receive_tweets(pid, tweet) do
