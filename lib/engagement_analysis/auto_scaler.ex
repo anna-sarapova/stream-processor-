@@ -10,7 +10,7 @@ defmodule EngagementAnalysis.AutoScaler do
 
   def receive_notification() do
     GenServer.cast(__MODULE__, :receive_notification)
-    Logger.info("Notification received", ansi_color: :green)
+#    Logger.info("Notification received", ansi_color: :green)
   end
 
   # Server start_module callback
@@ -31,7 +31,7 @@ defmodule EngagementAnalysis.AutoScaler do
       EngagementAnalysis.PoolSupervisor.start_worker(desired_worker_nr)
     else
       worker_number = div(count_tweets, 4)
-      active_children = DynamicSupervisor.count_children(PoolSupervisor).active
+      active_children = DynamicSupervisor.count_children(EngagementAnalysis.PoolSupervisor).active
       desired_worker_nr = worker_number - active_children
       EngagementAnalysis.PoolSupervisor.start_worker(desired_worker_nr)
     end
