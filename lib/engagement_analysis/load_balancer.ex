@@ -5,7 +5,7 @@ defmodule EngagementAnalysis.LoadBalancer do
   def start_module() do
     worker_list = []
     index = 0
-    Logger.info("Starting Load Balancer", ansi_color: :yellow)
+    Logger.info("Starting Engagement Load Balancer", ansi_color: :yellow)
     GenServer.start_link(__MODULE__, {worker_list, index}, name: __MODULE__)
   end
 
@@ -14,7 +14,6 @@ defmodule EngagementAnalysis.LoadBalancer do
   end
 
   def send_worker_pid(child) do
-    #    IO.inspect("Load Balancer: Child #{inspect(child)}")
     GenServer.cast(__MODULE__, {:add_worker, child})
   end
 
@@ -43,7 +42,6 @@ defmodule EngagementAnalysis.LoadBalancer do
         IO.inspect("Load Balancer: worker #{inspect(pid_to_kill)} is waiting to be killed")
         Process.send_after(pid_to_kill, {:terminate_work, pid_to_kill}, 5000)
       else
-        #      IO.inspect("Worker: worker #{inspect(pid_to_kill)} will be killed")
         worker_after_kill = DynamicSupervisor.count_children(EngagementAnalysis.PoolSupervisor).active
         DynamicSupervisor.terminate_child(EngagementAnalysis.PoolSupervisor, pid_to_kill)
         Logger.info("Pool Supervisor: number of workers after kill #{inspect(worker_after_kill)}", ansi_color: :yellow)
@@ -56,11 +54,9 @@ defmodule EngagementAnalysis.LoadBalancer do
   end
 
   def handle_cast({:receive_tweet, {id, tweet}}, state) do
-#    IO.inspect("LoadBalancer: id= #{inspect(id)}, tweet= #{inspect(tweet)}")
     {worker_list, index} = state
     if length(worker_list) > 0 do
       worker_pid = Enum.at(worker_list, rem(index, length(worker_list)))
-      #      IO.inspect("Load Balancer: Worker pid #{inspect(worker_pid)}")
       EngagementAnalysis.Worker.receive_tweets(worker_pid, id, tweet)
     end
     {:noreply, {worker_list, index + 1}}
@@ -69,7 +65,6 @@ defmodule EngagementAnalysis.LoadBalancer do
   def handle_cast({:add_worker, child}, state) do
     {worker_list, index} = state
     active_worker_list = Enum.concat(worker_list, [child])
-    #    IO.inspect("Load Balancer: Child list #{inspect(active_worker_list)}")
     {:noreply, {active_worker_list, index}}
   end
 

@@ -19,8 +19,10 @@ defmodule Router do
 
   def handle_cast({:receive_tweets, {id, tweet}}, state) do
     EngagementAnalysis.LoadBalancer.get_tweets( id, tweet)
-#    IO.inspect("ROUTER: id= #{inspect(id)} tweet= #{inspect(tweet)}")
     EngagementAnalysis.AutoScaler.receive_notification()
+    RetweetExtracting.LoadBalancer.get_tweets(id, tweet)
+    RetweetExtracting.AutoScaler.receive_notification()
+#    IO.inspect("ROUTER: id= #{inspect(id)} tweet= #{inspect(tweet)}")
     {:noreply, state}
   end
 end

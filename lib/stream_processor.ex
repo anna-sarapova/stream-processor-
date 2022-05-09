@@ -16,12 +16,24 @@ defmodule StreamProcessor do
         start: {EngagementAnalysis.LoadBalancer, :start_module, []}
       },
       %{
+        id: RetweetLoadBalancer,
+        start: {RetweetExtracting.LoadBalancer, :start_module, []}
+      },
+      %{
         id: EngagementPoolSupervisor,
         start: {EngagementAnalysis.PoolSupervisor, :start_module, []}
       },
       %{
+        id: RetweetPoolSupervisor,
+        start: {RetweetExtracting.PoolSupervisor, :start_module, []}
+      },
+      %{
         id: EngagementAutoScaler,
         start: {EngagementAnalysis.AutoScaler, :start_module, []}
+      },
+      %{
+        id: RetweetAutoScaler,
+        start: {RetweetExtracting.AutoScaler, :start_module, []}
       },
       #      %{
 #        id: SentimentTopSupervisor,
