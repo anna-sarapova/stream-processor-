@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="unpack" type="mix">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/unpack/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/unpack/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/unpack/ebin" />
+      <root url="file://$PROJECT_DIR$/_build/dev/lib/unpack/ebin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/deps/unpack/lib" />
+      <root url="file://$PROJECT_DIR$/deps/unpack/lib" />
+    </SOURCES>
+  </library>
+</component>
