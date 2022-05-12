@@ -24,7 +24,6 @@ defmodule Router do
     RetweetExtracting.AutoScaler.receive_notification()
     SentimentAnalysis.LoadBalancer.get_tweets(id, tweet)
     SentimentAnalysis.AutoScaler.receive_notification()
-#    IO.inspect("ROUTER: id= #{inspect(id)} tweet= #{inspect(tweet)}")
     Aggregator.add_tweet_info(id, tweet)
     {:noreply, state}
   end

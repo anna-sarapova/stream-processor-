@@ -42,7 +42,6 @@ defmodule SentimentAnalysis.LoadBalancer do
       else
         worker_after_kill = DynamicSupervisor.count_children(SentimentAnalysis.PoolSupervisor).active
         DynamicSupervisor.terminate_child(SentimentAnalysis.PoolSupervisor, pid_to_kill)
-#        Logger.info("Sentiment Load Balancer: number of workers after kill #{inspect(worker_after_kill)}", ansi_color: :yellow)
       end
     end
   end
@@ -69,14 +68,12 @@ defmodule SentimentAnalysis.LoadBalancer do
   def handle_cast({:kill_workers, child_to_kill}, state) do
     {worker_list, index} = state
     list_of_children_to_kill = Enum.take(worker_list, child_to_kill)
-#    IO.inspect("Sentiment Load Balancer: Children to kill #{inspect(list_of_children_to_kill)}")
     new_worker_list = Enum.drop(worker_list, length(list_of_children_to_kill) * (-1))
     delete_from_list(list_of_children_to_kill)
     {:noreply, {new_worker_list, index}}
   end
 
   def handle_info({:terminate_work, pid_to_kill}, state) do
-#    Logger.info("Sentiment Load Balancer: pid will be killed #{pid_to_kill}", ansi_color: :white)
     safe_termination(pid_to_kill)
     {:noreply, state}
   end

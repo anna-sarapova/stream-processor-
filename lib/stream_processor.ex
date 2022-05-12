@@ -47,14 +47,6 @@ defmodule StreamProcessor do
         id: SentimentAutoScaler,
         start: {SentimentAnalysis.AutoScaler, :start_module, []}
       },
-      #      %{
-#        id: SentimentTopSupervisor,
-#        start: {LoadBalancer, :start_module, [sentiment]}
-#      },
-#      %{
-#        id: RetweetTopSupervisor,
-#        start: {LoadBalancer, :start_module, [retweet]}
-#      },
       %{
         id: Aggregator,
         start: {Aggregator, :start_module, []}

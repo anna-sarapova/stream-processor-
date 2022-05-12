@@ -36,8 +36,7 @@ defmodule Aggregator do
 
   def update_record(records, id, record_type, info) do
     record = Map.get(records, id)
-    returned_record = Map.put(record, record_type, info)
-    returned_record
+    Map.put(record, record_type, info)
   end
 
   def update_record_by_id(records, id, new_record) do

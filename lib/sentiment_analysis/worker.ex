@@ -33,7 +33,6 @@ defmodule SentimentAnalysis.Worker do
     |> parse_words()
     |> calculate_sentiment_score()
     Aggregator.add_sentiment_score(id, sentiment_score)
-#    Logger.info("Sentiment Worker: sentiment-score #{inspect(sentiment_score)}", ansi_color: :light_blue)
   end
 
   def init(state) do

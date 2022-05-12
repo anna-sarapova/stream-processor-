@@ -35,7 +35,6 @@ defmodule EngagementAnalysis.AutoScaler do
       desired_worker_nr = worker_number - active_children
       EngagementAnalysis.PoolSupervisor.start_worker(desired_worker_nr)
     end
-    #    IO.inspect(" AutoScaler: tweets = #{count_tweets} ")
     {:noreply, 0}
   end
 
