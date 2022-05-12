@@ -56,6 +56,10 @@ defmodule StreamProcessor do
 #        start: {LoadBalancer, :start_module, [retweet]}
 #      },
       %{
+        id: Aggregator,
+        start: {Aggregator, :start_module, []}
+      },
+      %{
         id: Router,
         start: {Router, :start_module, []}
       },

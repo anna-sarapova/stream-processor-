@@ -71,7 +71,7 @@ defmodule EngagementAnalysis.LoadBalancer do
   def handle_cast({:kill_workers, child_to_kill}, state) do
     {worker_list, index} = state
     list_of_children_to_kill = Enum.take(worker_list, child_to_kill)
-    IO.inspect("Engagement Load Balancer: Children to kill #{inspect(list_of_children_to_kill)}")
+#    IO.inspect("Engagement Load Balancer: Children to kill #{inspect(list_of_children_to_kill)}")
     new_worker_list = Enum.drop(worker_list, length(list_of_children_to_kill) * (-1))
     delete_from_list(list_of_children_to_kill)
     {:noreply, {new_worker_list, index}}
