@@ -21,16 +21,11 @@ defmodule RetweetExtracting.Worker do
   def handle_cast({:forward_tweet, tweet}, state) do
     {:ok, tweet_data} = Poison.decode(tweet)
     tweet_info = tweet_data["message"]["tweet"]
-#    Logger.info("Tweet_info: #{inspect(tweet_info)}")
     retweet_status = Map.has_key?(tweet_info, "retweeted_status")
-#    Logger.info("Retweet_status: #{inspect(retweet_status)}", ansi_color: :light_cyan)
-
     if retweet_status do
       original_tweet = tweet_data["message"]["tweet"]["retweeted_status"]
-#      Logger.info("Original_tweet: #{inspect(tweet_info)}", ansi_color: :light_blue)
       new_tweet_data = %{"message" => %{"tweet" => original_tweet}}
       {:ok, new_tweet} = Poison.encode(new_tweet_data)
-#      Logger.info("Retweet worker: new tweet: #{inspect(new_tweet)}", ansi_color: :light_blue)
       Router.get_tweets(new_tweet)
     end
     {:noreply, state}
