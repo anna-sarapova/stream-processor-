@@ -69,7 +69,8 @@ defmodule Aggregator do
     case get_keys_number(record) do
       3 ->
         object = create_object(record)
-        Logger.info("Aggregator: object #{inspect(object)}", ansi_color: :magenta)
+#        Logger.info("Aggregator: object #{inspect(object)}", ansi_color: :magenta)
+        Batcher.receive_record(object)
         Map.delete(state.records, id)
       _ ->
         records

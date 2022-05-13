@@ -52,6 +52,10 @@ defmodule StreamProcessor do
         start: {Aggregator, :start_module, []}
       },
       %{
+        id: Batcher,
+        start: {Batcher, :start_module, []}
+      },
+      %{
         id: Router,
         start: {Router, :start_module, []}
       },
