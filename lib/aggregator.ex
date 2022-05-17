@@ -4,7 +4,8 @@ defmodule Aggregator do
 
   def start_module() do
     Logger.info("Aggregator has started")
-    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
+    database_state = 1
+    GenServer.start_link(__MODULE__, %{records: %{}, stored_objects: [], database_state: database_state}, name: __MODULE__)
   end
 
   def add_engagement_score(id, engagement_score) do
@@ -25,6 +26,7 @@ defmodule Aggregator do
   end
 
   def get_records(id, records) do
+#    Logger.info("records #{inspect(records)}, id #{inspect(id)}", ansi_color: :yellow)
     has_key = Map.has_key?(records, id)
     case has_key do
       false ->
@@ -63,6 +65,10 @@ defmodule Aggregator do
   end
 
   def create_record(record_type, info, id, state) do
+#    if state.database_state == 0 do
+#      Logger.info("Records: #{inspect(state.records)}", ansi_color: :light_blue)
+#      Logger.info("Records: #{inspect(state)}", ansi_color: :light_blue)
+#    end
     records = get_records(id, state.records)
     record = update_record(records, id, record_type, info)
     records = update_record_by_id(records, id, record)
@@ -70,30 +76,78 @@ defmodule Aggregator do
       3 ->
         object = create_object(record)
 #        Logger.info("Aggregator: object #{inspect(object)}", ansi_color: :magenta)
-        Batcher.receive_record(object)
-        Map.delete(state.records, id)
+        if state.database_state == 0 do
+#          Logger.info("db state #{inspect(state.database_state)}", ansi_color: :magenta)
+          pause_stream(object)
+          Map.delete(state.records, id)
+        else
+#          Logger.info("db state #{inspect(state.database_state)}", ansi_color: :magenta)
+          resume_stream()
+          Batcher.receive_record(object)
+          Map.delete(state.records, id)
+
+        end
       _ ->
         records
     end
   end
 
-  def init(_opts) do
-    {:ok, %{records: %{}}}
+  def pause_stream(object) do
+    GenServer.cast(__MODULE__, {:pause, object})
+  end
+
+  def receive_notification(database_state) do
+    Logger.info("Aggregator: Notification received", ansi_color: :green)
+    GenServer.cast(__MODULE__, {:receive_notification, database_state})
+  end
+
+  def resume_stream() do
+    GenServer.cast(__MODULE__, :resume)
+  end
+
+  def init(state) do
+    {:ok, state}
   end
 
   def handle_cast({:engagement, {id, engagement_score}}, state) do
     records = create_record("engagement", engagement_score, id, state)
-    {:noreply, %{records: records}}
+    {:noreply, %{state | records: records}}
   end
 
   def handle_cast({:sentiment, {id, sentiment_score}}, state) do
     records = create_record("sentiment", sentiment_score, id, state)
-    {:noreply, %{records: records}}
+    {:noreply, %{state | records: records}}
   end
 
   def handle_cast({:tweet, {id, tweet_data}}, state) do
     records = create_record("tweet", tweet_data, id, state)
-    {:noreply, %{records: records}}
+#    if state.database_state == 0 do
+#      Logger.info("Records: #{inspect(state.records)}", ansi_color: :light_blue)
+#      Logger.info("Records: #{inspect(state)}", ansi_color: :light_yellow)
+#    end
+    {:noreply, %{state | records: records}}
+  end
+
+  def handle_cast({:receive_notification, database_state}, state) do
+#    Logger.info("Records: #{inspect(state)}", ansi_color: :light_yellow)
+    {:noreply, %{state | database_state: database_state}}
+  end
+
+  def handle_cast({:pause, object}, state) do
+#    Logger.info("Records: #{inspect(state)}", ansi_color: :light_green)
+    object_list = [object | state.stored_objects]
+    length_of_list = length(object_list)
+    Logger.info("Aggregator: list in pause #{inspect(length_of_list)}")
+#    Logger.info("Aggregator: list in pause #{inspect(state)}")
+    {:noreply, %{state | stored_objects: object_list}}
+  end
+
+  def handle_cast(:resume, state) do
+    if length(state.stored_objects) > 0 do
+      Enum.each(state.stored_objects, fn object -> Batcher.receive_record(object) end)
+      Logger.info("Aggregator: resumed list #{inspect(length(state.stored_objects))}", ansi_color: :light_blue)
+    end
+    {:noreply, %{state | stored_objects: []}}
   end
 
 end
