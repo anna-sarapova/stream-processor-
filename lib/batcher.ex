@@ -23,9 +23,12 @@ defmodule Batcher do
 
   def send_to_database(records, mongo_db) do
     batch_size = Kernel.length(records)
+    start_time = System.monotonic_time()
     Mongo.insert_many(mongo_db, "tweets", get_tweet(records))
     Mongo.insert_many(mongo_db, "user", get_user(records))
-#    Logger.info("Batcher: the records were sent, batch size #{inspect(batch_size)}", ansi_color: :light_blue)
+    end_time = System.monotonic_time() - start_time
+    BatcherStats.add_execution_time(end_time)
+    BatcherStats.add_ingested_messages(batch_size)
   end
 
   def get_user(records) do

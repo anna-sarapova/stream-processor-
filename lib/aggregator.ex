@@ -26,7 +26,6 @@ defmodule Aggregator do
   end
 
   def get_records(id, records) do
-#    Logger.info("records #{inspect(records)}, id #{inspect(id)}", ansi_color: :yellow)
     has_key = Map.has_key?(records, id)
     case has_key do
       false ->
@@ -65,23 +64,16 @@ defmodule Aggregator do
   end
 
   def create_record(record_type, info, id, state) do
-#    if state.database_state == 0 do
-#      Logger.info("Records: #{inspect(state.records)}", ansi_color: :light_blue)
-#      Logger.info("Records: #{inspect(state)}", ansi_color: :light_blue)
-#    end
     records = get_records(id, state.records)
     record = update_record(records, id, record_type, info)
     records = update_record_by_id(records, id, record)
     case get_keys_number(record) do
       3 ->
         object = create_object(record)
-#        Logger.info("Aggregator: object #{inspect(object)}", ansi_color: :magenta)
         if state.database_state == 0 do
-#          Logger.info("db state #{inspect(state.database_state)}", ansi_color: :magenta)
           pause_stream(object)
           Map.delete(state.records, id)
         else
-#          Logger.info("db state #{inspect(state.database_state)}", ansi_color: :magenta)
           resume_stream()
           Batcher.receive_record(object)
           Map.delete(state.records, id)
@@ -121,24 +113,17 @@ defmodule Aggregator do
 
   def handle_cast({:tweet, {id, tweet_data}}, state) do
     records = create_record("tweet", tweet_data, id, state)
-#    if state.database_state == 0 do
-#      Logger.info("Records: #{inspect(state.records)}", ansi_color: :light_blue)
-#      Logger.info("Records: #{inspect(state)}", ansi_color: :light_yellow)
-#    end
     {:noreply, %{state | records: records}}
   end
 
   def handle_cast({:receive_notification, database_state}, state) do
-#    Logger.info("Records: #{inspect(state)}", ansi_color: :light_yellow)
     {:noreply, %{state | database_state: database_state}}
   end
 
   def handle_cast({:pause, object}, state) do
-#    Logger.info("Records: #{inspect(state)}", ansi_color: :light_green)
     object_list = [object | state.stored_objects]
     length_of_list = length(object_list)
     Logger.info("Aggregator: list in pause #{inspect(length_of_list)}")
-#    Logger.info("Aggregator: list in pause #{inspect(state)}")
     {:noreply, %{state | stored_objects: object_list}}
   end
 
