@@ -4,7 +4,8 @@ defmodule Aggregator do
 
   def start_module() do
     Logger.info("Aggregator has started")
-    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
+    database_state = 1
+    GenServer.start_link(__MODULE__, %{records: %{}, stored_objects: [], database_state: database_state}, name: __MODULE__)
   end
 
   def add_engagement_score(id, engagement_score) do
@@ -69,30 +70,69 @@ defmodule Aggregator do
     case get_keys_number(record) do
       3 ->
         object = create_object(record)
-        Logger.info("Aggregator: object #{inspect(object)}", ansi_color: :magenta)
-        Map.delete(state.records, id)
+        if state.database_state == 0 do
+          pause_stream(object)
+          Map.delete(state.records, id)
+        else
+          resume_stream()
+          Batcher.receive_record(object)
+          Map.delete(state.records, id)
+
+        end
       _ ->
         records
     end
   end
 
-  def init(_opts) do
-    {:ok, %{records: %{}}}
+  def pause_stream(object) do
+    GenServer.cast(__MODULE__, {:pause, object})
+  end
+
+  def receive_notification(database_state) do
+    Logger.info("Aggregator: Notification received", ansi_color: :green)
+    GenServer.cast(__MODULE__, {:receive_notification, database_state})
+  end
+
+  def resume_stream() do
+    GenServer.cast(__MODULE__, :resume)
+  end
+
+  def init(state) do
+    {:ok, state}
   end
 
   def handle_cast({:engagement, {id, engagement_score}}, state) do
     records = create_record("engagement", engagement_score, id, state)
-    {:noreply, %{records: records}}
+    {:noreply, %{state | records: records}}
   end
 
   def handle_cast({:sentiment, {id, sentiment_score}}, state) do
     records = create_record("sentiment", sentiment_score, id, state)
-    {:noreply, %{records: records}}
+    {:noreply, %{state | records: records}}
   end
 
   def handle_cast({:tweet, {id, tweet_data}}, state) do
     records = create_record("tweet", tweet_data, id, state)
-    {:noreply, %{records: records}}
+    {:noreply, %{state | records: records}}
+  end
+
+  def handle_cast({:receive_notification, database_state}, state) do
+    {:noreply, %{state | database_state: database_state}}
+  end
+
+  def handle_cast({:pause, object}, state) do
+    object_list = [object | state.stored_objects]
+    length_of_list = length(object_list)
+    Logger.info("Aggregator: list in pause #{inspect(length_of_list)}")
+    {:noreply, %{state | stored_objects: object_list}}
+  end
+
+  def handle_cast(:resume, state) do
+    if length(state.stored_objects) > 0 do
+      Enum.each(state.stored_objects, fn object -> Batcher.receive_record(object) end)
+      Logger.info("Aggregator: resumed list #{inspect(length(state.stored_objects))}", ansi_color: :light_blue)
+    end
+    {:noreply, %{state | stored_objects: []}}
   end
 
 end

@@ -25,7 +25,8 @@ defmodule StreamProcessor.MixProject do
       {:unpack, "~> 0.1.7"},
       {:ex_doc, "~> 0.28.0"},
       {:eventsource_ex, "~> 1.1.0"},
-      {:poison, "~> 5.0"}
+      {:poison, "~> 3.1"},
+      {:mongodb, "~>0.5.1"}
     ]
   end
 end

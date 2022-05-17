@@ -28,6 +28,11 @@
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/ex_doc" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/uuid" />
       <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/elixir_uuid" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/connection" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/mongodb" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/db_connection" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/telemetry" />
+      <excludeFolder url="file://$MODULE_DIR$/_build/dev/lib/decimal" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -68,5 +73,10 @@
     <orderEntry type="library" name="uuid" level="project" />
     <orderEntry type="library" name="benchfella" level="project" />
     <orderEntry type="library" name="elixir_uuid" level="project" />
+    <orderEntry type="library" name="mongodb" level="project" />
+    <orderEntry type="library" name="jazz" level="project" />
+    <orderEntry type="library" name="connection" level="project" />
+    <orderEntry type="library" name="db_connection" level="project" />
+    <orderEntry type="library" name="telemetry" level="project" />
   </component>
 </module>
